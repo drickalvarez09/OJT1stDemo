@@ -1,0 +1,375 @@
+/* index.css - Complete styling for all dashboard views */
+
+/* ========== CUSTOM SCROLLBARS ========== */
+/* Table container scrollbar */
+#tableContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+#tableContainer::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+#tableContainer::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+#tableContainer::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Activity list scrollbars */
+#unobligatedActivityList::-webkit-scrollbar,
+#projectedBURList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#unobligatedActivityList::-webkit-scrollbar-track,
+#projectedBURList::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+#unobligatedActivityList::-webkit-scrollbar-thumb,
+#projectedBURList::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+#unobligatedActivityList::-webkit-scrollbar-thumb:hover,
+#projectedBURList::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Firefox scrollbar styling */
+#tableContainer,
+#unobligatedActivityList,
+#projectedBURList {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* ========== ANIMATIONS AND TRANSITIONS ========== */
+/* Modal backdrop animation */
+#tableView {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal content animation */
+#tableView > div {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* View transition animations */
+#mainChartView,
+#projectionView {
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* ========== SUMMARY CARDS ========== */
+.bg-white {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-white:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Card hover glow effect */
+.bg-white:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ========== BUTTON STYLES ========== */
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+/* Primary button styles */
+.bg-blue-600:hover,
+.bg-green-600:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Outline button styles */
+.border-blue-600:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+/* ========== TABLE STYLES ========== */
+/* Table row hover effects */
+#budgetTableBody tr {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+#budgetTableBody tr:hover {
+  background-color: #f8fafc;
+  transform: scale(1.002);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Table header styling */
+#budgetTable thead th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+/* Sticky header enhancement */
+#budgetTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(8px);
+  background-color: rgba(248, 250, 252, 0.95);
+}
+
+/* ========== FILTER BUTTONS ========== */
+.filter-btn,
+.program-chip {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.filter-btn:hover,
+.program-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+.program-chip.bg-blue-600 {
+  box-shadow: 0 2px 8px -1px rgba(59, 130, 246, 0.4);
+}
+
+/* ========== CHART CONTAINERS ========== */
+.relative {
+  position: relative;
+}
+
+/* Chart container hover effects */
+.bg-white.rounded-2xl {
+  transition: all 0.3s ease;
+}
+
+.bg-white.rounded-2xl:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ========== ACTIVITY LIST ITEMS ========== */
+#unobligatedActivityList > div,
+#projectedBURList > div {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+#unobligatedActivityList > div:hover,
+#projectedBURList > div:hover {
+  transform: translateX(4px);
+  border-color: #e5e7eb;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* ========== LOADING STATES ========== */
+/* Skeleton loading for cards */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .grid {
+    gap: 1rem;
+  }
+  
+  /* Mobile table adjustments */
+  #tableContainer {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+  
+  /* Mobile button stack */
+  .flex.justify-center.gap-4 {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .flex.justify-center.gap-4 button {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* Tablet adjustments */
+  .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== ACCESSIBILITY ========== */
+/* Focus styles for keyboard navigation */
+button:focus,
+.program-chip:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  ring-width: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white {
+    border: 1px solid #000;
+  }
+  
+  .text-gray-600 {
+    color: #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== CONSISTENT BORDER RADIUS ========== */
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+/* ========== CONSISTENT SHADOW DEPTHS ========== */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* ========== GRADIENT TEXT ========== */
+.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+  button,
+  #toggleProjection,
+  #toggleTableView {
+    display: none !important;
+  }
+  
+  #tableView:not(.hidden) {
+    position: relative !important;
+    background: white !important;
+  }
+  
+  #tableView .bg-black\/50 {
+    background: white !important;
+  }
+}
