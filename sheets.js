@@ -92,16 +92,6 @@ function isLikelyHeaderRow(row) {
   return row.length > 0 && row.every((c) => isNaN(Number(c.v)) && c.f !== "");
 }
 
-const parsePercentage = (value) => {
-  if (typeof value === "number") return value;
-  if (typeof value === "string") {
-    const cleaned = value.replace("%", "").trim();
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? 0 : num;
-  }
-  return 0;
-};
-
 const parseCurrency = (value) => {
   if (typeof value === "number") return value;
   if (typeof value === "string") {
@@ -112,8 +102,16 @@ const parseCurrency = (value) => {
   return 0;
 };
 
+// Prefer gviz's formatted text when it carries a percent sign, since gviz
+// reports percent-formatted cells as a 0-1 fraction in `v`.
+const parseBurCell = (cell) => {
+  if (!cell) return 0;
+  const raw = typeof cell.f === "string" && cell.f.includes("%") ? cell.f : cell.v;
+  return parsePercentage(raw);
+};
+
 document.addEventListener("DOMContentLoaded", async function () {
-  feather.replace();
+  replaceIcons();
 
   // ------------------------------------------------------------------
   // "Funds" tab -> main dashboard
@@ -153,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     [COL.ALLOC, COL.OBLIG, COL.UNOBLIG_BAL].forEach((colIndex) => {
       if (newRow[colIndex]) newRow[colIndex].v = parseCurrency(newRow[colIndex].v);
     });
-    if (newRow[COL.BUR]) newRow[COL.BUR].v = parsePercentage(newRow[COL.BUR].v);
+    if (newRow[COL.BUR]) newRow[COL.BUR].v = parseBurCell(newRow[COL.BUR]);
     return newRow;
   });
 
@@ -182,17 +180,22 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // --- Program Totals (for charts) ---
   const programTotals = {};
+  const programObligationTotals = {};
   dataRows.forEach((r) => {
     const program = r[COL.PROGRAM]?.f || r[COL.PROGRAM]?.v || "Unlabeled";
-    const allocation = Number(r[COL.ALLOC]?.v) || 0;
-    if (!programTotals[program]) programTotals[program] = 0;
-    programTotals[program] += allocation;
+    if (!programTotals[program]) {
+      programTotals[program] = 0;
+      programObligationTotals[program] = 0;
+    }
+    programTotals[program] += Number(r[COL.ALLOC]?.v) || 0;
+    programObligationTotals[program] += Number(r[COL.OBLIG]?.v) || 0;
   });
 
   const programLabels = Object.keys(programTotals);
   const programData = Object.values(programTotals);
+  const programObligationData = programLabels.map((p) => programObligationTotals[p]);
 
-  window.chartData = { dataRows, programLabels, programData, COL };
+  window.chartData = { dataRows, programLabels, programData, programObligationData, COL };
 
   // ------------------------------------------------------------------
   // "Per UACS" tab -> Per UACS View (allocation/obligation/unobligated
@@ -227,7 +230,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     [UACS_COL.ALLOC, UACS_COL.OBLIG, UACS_COL.UNOBLIG_BAL].forEach((colIndex) => {
       if (newRow[colIndex]) newRow[colIndex].v = parseCurrency(newRow[colIndex].v);
     });
-    if (newRow[UACS_COL.BUR]) newRow[UACS_COL.BUR].v = parsePercentage(newRow[UACS_COL.BUR].v);
+    if (newRow[UACS_COL.BUR]) newRow[UACS_COL.BUR].v = parseBurCell(newRow[UACS_COL.BUR]);
     return newRow;
   });
 

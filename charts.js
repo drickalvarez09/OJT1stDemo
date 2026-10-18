@@ -1,7 +1,7 @@
 // charts.js - Optimized with better event handling and organization
 document.addEventListener("DOMContentLoaded", function() {
   let chartInstances = [];
-  
+
   // Helper function to destroy existing charts
   const destroyCharts = () => {
     chartInstances.forEach(chart => {
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(0, 0, 0, 0.1)' },
-        ticks: { 
+        ticks: {
           color: '#374151',
           callback: function(value) {
             return '₱' + value.toLocaleString();
@@ -59,24 +59,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   };
 
-  // Helper function to parse percentage values
-  const parseChartPercentage = (value) => {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-      const cleaned = value.replace('%', '').trim();
-      const num = parseFloat(cleaned);
-      return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
-
   // ========== FUND ALLOCATION BY PROGRAM ==========
   const createProgramChart = (programLabels, programData) => {
     const programCanvas = document.getElementById("programChart");
     if (!programCanvas) return null;
 
     const ctx = programCanvas.getContext("2d");
-    
+
     const chart = new Chart(ctx, {
       type: "bar",
       data: {
@@ -94,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
       },
       options: {
         ...CHART_OPTIONS,
-        plugins: { 
+        plugins: {
           ...CHART_OPTIONS.plugins,
           legend: { display: false },
           tooltip: {
@@ -110,21 +99,21 @@ document.addEventListener("DOMContentLoaded", function() {
     return chart;
   };
 
-  // ========== DISBURSEMENT DISTRIBUTION ==========
-  const createExpenseChart = (programLabels, programData) => {
+  // ========== OBLIGATION DISTRIBUTION ==========
+  const createExpenseChart = (programLabels, obligationData) => {
     const expenseCanvas = document.getElementById("expenseChart");
     if (!expenseCanvas) return null;
 
     const ctx = expenseCanvas.getContext("2d");
-    
+
     const chart = new Chart(ctx, {
       type: "doughnut",
       data: {
         labels: programLabels,
         datasets: [
           {
-            label: "Disbursement (₱)",
-            data: programData,
+            label: "Obligation (₱)",
+            data: obligationData,
             backgroundColor: CHART_COLORS.donut,
             borderWidth: 0,
           },
@@ -134,21 +123,21 @@ document.addEventListener("DOMContentLoaded", function() {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '60%',
-        plugins: { 
-          legend: { 
-            position: "bottom", 
-            labels: { 
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
               color: '#374151',
               font: { size: 11 },
               padding: 15
-            } 
+            }
           },
           tooltip: {
             ...CHART_OPTIONS.plugins.tooltip,
             callbacks: {
               label: (ctx) => {
                 const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((ctx.parsed / total) * 100).toFixed(1);
+                const percentage = total ? ((ctx.parsed / total) * 100).toFixed(1) : "0.0";
                 return `${ctx.label}: ₱${ctx.parsed.toLocaleString()} (${percentage}%)`;
               }
             }
@@ -177,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const data = Object.values(programUnobligated);
 
     const ctx = unobligatedProgramCanvas.getContext("2d");
-    
+
     const chart = new Chart(ctx, {
       type: "bar",
       data: {
@@ -195,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
       },
       options: {
         ...CHART_OPTIONS,
-        plugins: { 
+        plugins: {
           ...CHART_OPTIONS.plugins,
           legend: { display: false },
           tooltip: {
@@ -235,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function() {
           <p class="text-sm">No unobligated balances found</p>
         </div>
       `;
-      feather.replace();
+      replaceIcons();
       return;
     }
 
@@ -244,8 +233,8 @@ document.addEventListener("DOMContentLoaded", function() {
       div.className = "flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200";
       div.innerHTML = `
         <div class="flex-1">
-          <div class="font-semibold text-gray-800 text-sm">${a.activity}</div>
-          <div class="text-xs text-gray-600 mt-1">${a.program}</div>
+          <div class="font-semibold text-gray-800 text-sm">${escapeHtml(a.activity)}</div>
+          <div class="text-xs text-gray-600 mt-1">${escapeHtml(a.program)}</div>
         </div>
         <div class="text-right">
           <div class="font-bold text-blue-600 text-sm">₱${a.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
@@ -257,71 +246,36 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // ========== INITIALIZE ALL CHARTS ==========
   const initializeCharts = (chartData) => {
-    const { dataRows, programLabels, programData, COL } = chartData;
-    
+    if (typeof Chart === "undefined") {
+      console.error("Chart.js failed to load; main charts were not rendered.");
+      return;
+    }
+
+    const { dataRows, programLabels, programData, programObligationData, COL } = chartData;
+
     // Destroy existing charts first
     destroyCharts();
-    
+
     // Create new charts
     const charts = [
       createProgramChart(programLabels, programData),
-      createExpenseChart(programLabels, programData),
+      createExpenseChart(programLabels, programObligationData),
       createUnobligatedProgramChart(dataRows, COL)
     ];
-    
+
     // Filter out null charts and add to instances
     chartInstances = charts.filter(chart => chart !== null);
-    
+
     // Create activity list
     createUnobligatedActivityList(dataRows, COL);
-    
+
     console.log("Main charts initialized successfully");
   };
 
   // ========== EVENT HANDLERS ==========
-  
+
   // Initialize charts when data is ready
   document.addEventListener("dataReady", (e) => {
     initializeCharts(e.detail);
-  });
-
-  // Clean up charts when main view is hidden
-  document.addEventListener("mainViewHidden", () => {
-    destroyCharts();
-  });
-
-  // Reinitialize charts when main view is shown
-  document.addEventListener("mainViewShown", () => {
-    if (window.chartData) {
-      initializeCharts(window.chartData);
-    }
-  });
-
-  // Handle view changes from projection
-  document.addEventListener("projectionViewChanged", (event) => {
-    const { isProjectionView } = event.detail;
-    
-    if (!isProjectionView && window.chartData) {
-      // Returning to main view - reinitialize charts if needed
-      setTimeout(() => {
-        const mainChartView = document.getElementById("mainChartView");
-        if (mainChartView && !mainChartView.classList.contains("hidden")) {
-          initializeCharts(window.chartData);
-        }
-      }, 100);
-    }
-  });
-
-  // Handle window resize for chart responsiveness
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      chartInstances.forEach(chart => {
-        if (chart && typeof chart.resize === 'function') {
-          chart.resize();
-        }
-      });
-    }, 250);
   });
 });

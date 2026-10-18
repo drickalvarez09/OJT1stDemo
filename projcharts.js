@@ -1,19 +1,7 @@
-// projcharts.js - Add proper reinitialization logic
+// projcharts.js - Per UACS charts, initialized when the view is shown
 document.addEventListener("DOMContentLoaded", function() {
   let projectionChartInstances = [];
   let projectionData = null; // Store projection data
-
-  // Add the missing parsePercentage function
-  const parsePercentage = (value) => {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-      // Remove % symbol and any whitespace, then convert to number
-      const cleaned = value.replace('%', '').trim();
-      const num = parseFloat(cleaned);
-      return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
 
   // Helper function to destroy existing charts
   const destroyProjectionCharts = () => {
@@ -25,18 +13,16 @@ document.addEventListener("DOMContentLoaded", function() {
     projectionChartInstances = [];
   };
 
-
-  // Store projection data when ready
-  document.addEventListener("projectionDataReady", (e) => {
-    projectionData = e.detail;
-    initializeProjectionCharts(projectionData);
-  });
-
   // Initialize all projection charts
   const initializeProjectionCharts = (data) => {
     if (!data) return;
-    
-    const { dataRows, programLabels, programData, COL, totals, objectTotals } = data;
+
+    if (typeof Chart === "undefined") {
+      console.error("Chart.js failed to load; projection charts were not rendered.");
+      return;
+    }
+
+    const { dataRows, COL } = data;
     destroyProjectionCharts(); // Clear existing charts first
 
     // Colors for projection charts
@@ -82,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { 
+          plugins: {
             legend: { display: false },
             tooltip: {
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -96,23 +82,23 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           },
           scales: {
-            y: { 
-              beginAtZero: true, 
+            y: {
+              beginAtZero: true,
               grid: { color: 'rgba(0, 0, 0, 0.1)' },
-              ticks: { 
+              ticks: {
                 color: '#374151',
                 callback: function(value) {
                   return '₱' + value.toLocaleString();
                 }
-              } 
+              }
             },
-            x: { 
+            x: {
               grid: { color: 'rgba(0, 0, 0, 0.1)' },
-              ticks: { 
+              ticks: {
                 color: '#374151',
                 maxRotation: 45,
                 minRotation: 45
-              } 
+              }
             },
           },
         },
@@ -146,14 +132,14 @@ document.addEventListener("DOMContentLoaded", function() {
           responsive: true,
           maintainAspectRatio: false,
           cutout: '60%',
-          plugins: { 
-            legend: { 
-              position: "bottom", 
-              labels: { 
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
                 color: '#374151',
                 font: { size: 11 },
                 padding: 15
-              } 
+              }
             },
             tooltip: {
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -216,23 +202,23 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           },
           scales: {
-            y: { 
-              beginAtZero: true, 
+            y: {
+              beginAtZero: true,
               grid: { color: 'rgba(0, 0, 0, 0.1)' },
-              ticks: { 
+              ticks: {
                 color: '#374151',
                 callback: function(value) {
                   return '₱' + value.toLocaleString();
                 }
-              } 
+              }
             },
-            x: { 
+            x: {
               grid: { color: 'rgba(0, 0, 0, 0.1)' },
-              ticks: { 
+              ticks: {
                 color: '#374151',
                 maxRotation: 45,
                 minRotation: 45
-              } 
+              }
             },
           },
         },
@@ -261,9 +247,9 @@ document.addEventListener("DOMContentLoaded", function() {
         div.className = "flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200";
         div.innerHTML = `
           <div class="flex-1">
-            <div class="font-semibold text-gray-800 text-sm">${a.object}</div>
-            <div class="text-xs text-gray-600 mt-1">${a.activity}</div>
-            <div class="text-xs text-gray-500 mt-1">${a.program} · Allocation: ₱${a.allocation.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+            <div class="font-semibold text-gray-800 text-sm">${escapeHtml(a.object)}</div>
+            <div class="text-xs text-gray-600 mt-1">${escapeHtml(a.activity)}</div>
+            <div class="text-xs text-gray-500 mt-1">${escapeHtml(a.program)} · Allocation: ₱${a.allocation.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
           </div>
           <div class="text-right">
             <div class="font-bold ${a.bur >= 80 ? 'text-green-600' : a.bur >= 50 ? 'text-orange-600' : 'text-red-600'} text-sm">
@@ -283,12 +269,21 @@ document.addEventListener("DOMContentLoaded", function() {
             <p class="text-sm">BUR rates by object code will appear here once loaded</p>
           </div>
         `;
-        feather.replace();
+        replaceIcons();
       }
     }
 
     console.log("Projection charts initialized successfully");
   };
+
+  // Store projection data when ready; only render if the view is already visible
+  document.addEventListener("projectionDataReady", (e) => {
+    projectionData = e.detail;
+    const projectionView = document.getElementById("projectionView");
+    if (projectionView && !projectionView.classList.contains("hidden")) {
+      initializeProjectionCharts(projectionData);
+    }
+  });
 
   // Clean up charts when projection view is hidden
   document.addEventListener("projectionViewHidden", () => {
@@ -298,23 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Reinitialize charts when projection view is shown
   document.addEventListener("projectionViewShown", () => {
     if (projectionData) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        initializeProjectionCharts(projectionData);
-      }, 100);
+      initializeProjectionCharts(projectionData);
     }
-  });
-
-  // Handle window resize
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      projectionChartInstances.forEach(chart => {
-        if (chart && typeof chart.resize === 'function') {
-          chart.resize();
-        }
-      });
-    }, 250);
   });
 });

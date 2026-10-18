@@ -90,19 +90,19 @@
 }
 
 /* ========== SUMMARY CARDS ========== */
-.bg-white {
+.card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
-.bg-white:hover {
+.card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* Card hover glow effect */
-.bg-white:hover::before {
+.card:hover::before {
   content: '';
   position: absolute;
   top: 0;
@@ -116,41 +116,6 @@
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
-}
-
-/* ========== BUTTON STYLES ========== */
-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-button:hover::before {
-  left: 100%;
-}
-
-/* Primary button styles */
-.bg-blue-600:hover,
-.bg-green-600:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-}
-
-/* Outline button styles */
-.border-blue-600:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
 }
 
 /* ========== TABLE STYLES ========== */
@@ -202,20 +167,6 @@ button:hover::before {
   box-shadow: 0 2px 8px -1px rgba(59, 130, 246, 0.4);
 }
 
-/* ========== CHART CONTAINERS ========== */
-.relative {
-  position: relative;
-}
-
-/* Chart container hover effects */
-.bg-white.rounded-2xl {
-  transition: all 0.3s ease;
-}
-
-.bg-white.rounded-2xl:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
 /* ========== ACTIVITY LIST ITEMS ========== */
 #unobligatedActivityList > div,
 #projectedBURList > div {
@@ -249,23 +200,23 @@ button:hover::before {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .grid {
     gap: 1rem;
   }
-  
+
   /* Mobile table adjustments */
   #tableContainer {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
   }
-  
+
   /* Mobile button stack */
   .flex.justify-center.gap-4 {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .flex.justify-center.gap-4 button {
     width: 100%;
     max-width: 280px;
@@ -285,15 +236,14 @@ button:focus,
 .program-chip:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
-  ring-width: 2px;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .bg-white {
+  .card {
     border: 1px solid #000;
   }
-  
+
   .text-gray-600 {
     color: #000;
   }
@@ -310,42 +260,8 @@ button:focus,
   }
 }
 
-/* ========== CONSISTENT BORDER RADIUS ========== */
-.rounded-2xl {
-  border-radius: 1rem;
-}
-
-.rounded-xl {
-  border-radius: 0.75rem;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
-/* ========== CONSISTENT SHADOW DEPTHS ========== */
-.shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-xl {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
 /* ========== GRADIENT TEXT ========== */
-.bg-gradient-to-r {
+.text-gradient {
   background-size: 200% 200%;
   animation: gradientShift 3s ease infinite;
 }
@@ -363,12 +279,12 @@ button:focus,
   #toggleTableView {
     display: none !important;
   }
-  
+
   #tableView:not(.hidden) {
     position: relative !important;
     background: white !important;
   }
-  
+
   #tableView .bg-black\/50 {
     background: white !important;
   }

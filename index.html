@@ -7,8 +7,9 @@
 
     <!-- Tailwind + Charts -->
     <link rel="stylesheet" href="./tailwind.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://unpkg.com/feather-icons" defer></script>
+    <script src="utils.js" defer></script>
     <script src="sheets.js" defer></script>
     <script src="charts.js" defer></script>
     <script src="logic.js" defer></script>
@@ -19,11 +20,11 @@
 
   <body class="min-h-screen bg-gray-50">
     <!-- Main Container -->
-    <div class="flex-1 container mx-auto px-4 py-8 flex flex-col space-y-12">
+    <div id="appShell" class="flex-1 container mx-auto px-4 py-8 flex flex-col space-y-12">
       <!-- Header -->
       <header class="text-center space-y-6">
         <div class="relative inline-block">
-          <h1 class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+          <h1 class="text-gradient text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             Region 3 ICT
           </h1>
           <p class="text-xl md:text-2xl text-gray-600 mt-2 font-light">
@@ -40,6 +41,9 @@
           <!-- Main View Button -->
           <button
             id="toggleProjection"
+            type="button"
+            aria-expanded="false"
+            aria-controls="projectionView"
             class="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-semibold"
           >
             <i data-feather="trending-up" class="w-6 h-6"></i>
@@ -49,6 +53,9 @@
           <!-- Table View Button -->
           <button
             id="toggleTableView"
+            type="button"
+            aria-expanded="false"
+            aria-controls="tableView"
             class="inline-flex items-center gap-3 px-8 py-4 rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 font-semibold"
           >
             <i data-feather="bar-chart-2" class="w-6 h-6"></i>
@@ -61,33 +68,33 @@
       <div id="mainChartView" class="flex flex-col space-y-12">
         <!-- Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Fund Allocation</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Fund Allocation</h2>
               <i data-feather="dollar-sign" class="w-5 h-5 text-blue-500"></i>
             </div>
             <span id="totalAllocation" class="block text-3xl font-bold text-blue-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Obligated</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Obligated</h2>
               <i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>
             </div>
             <span id="totalObligated" class="block text-3xl font-bold text-green-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Unobligated</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Unobligated</h2>
               <i data-feather="clock" class="w-5 h-5 text-purple-500"></i>
             </div>
             <span id="totalUnobligated" class="block text-3xl font-bold text-purple-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">BUR Rate</h3>
+              <h2 class="text-gray-600 text-sm font-medium">BUR Rate</h2>
               <i data-feather="trending-up" class="w-5 h-5 text-orange-500"></i>
             </div>
             <span id="burRate" class="block text-3xl font-bold text-orange-600">0.00%</span>
@@ -96,17 +103,17 @@
 
         <!-- Charts Row 1 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Fund Allocation by Program</h2>
             <div class="relative h-[400px]">
-              <canvas id="programChart"></canvas>
+              <canvas id="programChart" role="img" aria-label="Bar chart of fund allocation by program"></canvas>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Disbursement Distribution</h2>
             <div class="relative h-[400px]">
-              <canvas id="expenseChart"></canvas>
+              <canvas id="expenseChart" role="img" aria-label="Doughnut chart of obligation distribution by program"></canvas>
             </div>
           </div>
         </section>
@@ -114,15 +121,15 @@
         <!-- Charts Row 2 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Unobligated Balances by Program -->
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Unobligated Balances by Program</h2>
             <div class="relative h-[400px]">
-              <canvas id="unobligatedProgramChart"></canvas>
+              <canvas id="unobligatedProgramChart" role="img" aria-label="Bar chart of unobligated balances by program"></canvas>
             </div>
           </div>
 
           <!-- Unobligated Balances by Activity -->
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Unobligated Balances by Activity</h2>
 
             <!-- 👇 Scrollable List Container -->
@@ -138,33 +145,33 @@
       <div id="projectionView" class="hidden flex flex-col space-y-12">
         <!-- Per UACS Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Allocation (Per UACS)</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Allocation (Per UACS)</h2>
               <i data-feather="dollar-sign" class="w-5 h-5 text-blue-500"></i>
             </div>
             <span id="totalProjectedAllocation" class="block text-3xl font-bold text-blue-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Obligation (Per UACS)</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Obligation (Per UACS)</h2>
               <i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>
             </div>
             <span id="totalProjectedObligation" class="block text-3xl font-bold text-green-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">Total Unobligated (Per UACS)</h3>
+              <h2 class="text-gray-600 text-sm font-medium">Total Unobligated (Per UACS)</h2>
               <i data-feather="clock" class="w-5 h-5 text-purple-500"></i>
             </div>
             <span id="totalProjectedUnobligated" class="block text-3xl font-bold text-purple-600">₱0.00</span>
           </div>
 
-          <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="card bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-gray-600 text-sm font-medium">BUR Rate (Per UACS)</h3>
+              <h2 class="text-gray-600 text-sm font-medium">BUR Rate (Per UACS)</h2>
               <i data-feather="trending-up" class="w-5 h-5 text-orange-500"></i>
             </div>
             <span id="projectedBurRate" class="block text-3xl font-bold text-orange-600">0.00%</span>
@@ -173,17 +180,17 @@
 
         <!-- Per UACS Charts Row 1 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Allocation by Object Code</h2>
             <div class="relative h-[400px]">
-              <canvas id="projectedProgramChart"></canvas>
+              <canvas id="projectedProgramChart" role="img" aria-label="Bar chart of allocation by object code"></canvas>
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Obligation Distribution by Object Code</h2>
             <div class="relative h-[400px]">
-              <canvas id="projectedExpenseChart"></canvas>
+              <canvas id="projectedExpenseChart" role="img" aria-label="Doughnut chart of obligation distribution by object code"></canvas>
             </div>
           </div>
         </section>
@@ -191,15 +198,15 @@
         <!-- Per UACS Charts Row 2 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Unobligated Balances by Object Code -->
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">Unobligated Balances by Object Code</h2>
             <div class="relative h-[400px]">
-              <canvas id="projectedUnobligatedChart"></canvas>
+              <canvas id="projectedUnobligatedChart" role="img" aria-label="Bar chart of unobligated balances by object code"></canvas>
             </div>
           </div>
 
           <!-- BUR Rates by Object Code -->
-          <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col">
+          <div class="card bg-white rounded-2xl p-8 border border-gray-200 shadow-sm flex flex-col">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">BUR Rates by Object Code</h2>
 
             <!-- 👇 Scrollable List Container -->
@@ -213,22 +220,31 @@
     </div>
 
     <!-- Table Section - Modal -->
-    <div id="tableView" class="hidden fixed inset-0 bg-black/50 z-50 transition-all duration-300">
+    <div
+      id="tableView"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tableViewTitle"
+      aria-hidden="true"
+      class="hidden fixed inset-0 bg-black/50 z-50 transition-all duration-300"
+    >
       <!-- Modal Container -->
       <div class="flex items-center justify-center min-h-screen p-4">
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[90vh] flex flex-col overflow-hidden">
-          
+
           <!-- Header with Close Button -->
           <div class="flex-shrink-0 p-8 pb-4 border-b border-gray-200 bg-white">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <h2 class="text-3xl font-bold text-gray-800">
+                <h2 id="tableViewTitle" class="text-3xl font-bold text-gray-800">
                   Detailed Budget Analysis
                 </h2>
                 <p class="text-gray-600 mt-2">Comprehensive breakdown of all budget allocations and obligations</p>
               </div>
               <button
                 id="closeTable"
+                type="button"
+                aria-label="Close table view"
                 class="p-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-all duration-300"
               >
                 <i data-feather="x" class="w-6 h-6"></i>
@@ -306,7 +322,7 @@
                   </th>
                 </tr>
               </thead>
-              
+
               <tbody id="budgetTableBody" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
